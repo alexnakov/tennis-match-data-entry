@@ -3,96 +3,44 @@ from tkinter import messagebox
 
 my_lightblue = '#b2d6fe'
 
+def get_current_data():
+    """Retrieves the currently selected data from all listboxes."""
+    data = {
+        "1st Serve Direction": listbox_1st_direction.get(tk.ACTIVE) if listbox_1st_direction.curselection() else "",
+        "1st Serve Result": listbox_1st_result.get(tk.ACTIVE) if listbox_1st_result.curselection() else "",
+        "2nd Serve Direction": listbox_2nd_direction.get(tk.ACTIVE) if listbox_2nd_direction.curselection() else "",
+        "2nd Serve Result": listbox_2nd_result.get(tk.ACTIVE) if listbox_2nd_result.curselection() else "",
+        "Return - Type": listbox_return_type.get(tk.ACTIVE) if listbox_return_type.curselection() else "",
+        "Return - Shot": listbox_return_shot.get(tk.ACTIVE) if listbox_return_shot.curselection() else "",
+        "Return - Outcome": listbox_return_outcome.get(tk.ACTIVE) if listbox_return_outcome.curselection() else "",
+        "Point Winner": listbox_point_winner.get(tk.ACTIVE) if listbox_point_winner.curselection() else "",
+        "End - Type": listbox_end_type.get(tk.ACTIVE) if listbox_end_type.curselection() else "",
+        "End - Shot": listbox_end_shot.get(tk.ACTIVE) if listbox_end_shot.curselection() else "",
+        "End - Outcome": listbox_end_outcome.get(tk.ACTIVE) if listbox_end_outcome.curselection() else "",
+        "Strategy - Position": listbox_strategy_position.get(tk.ACTIVE) if listbox_strategy_position.curselection() else "",
+        "Strategy - Play Style": listbox_strategy_play_style.get(tk.ACTIVE) if listbox_strategy_play_style.curselection() else ""
+    }
+    return data
+
 def submit_data():
     """Function to handle the form submission"""
-    data = {}
-
-    # List of listboxes and their respective labels for key names
-    listboxes = {
-        "1st Serve Direction": listbox_1st_direction,
-        "1st Serve Result": listbox_1st_result,
-        "2nd Serve Direction": listbox_2nd_direction,
-        "2nd Serve Result": listbox_2nd_result,
-        "Return - Type": listbox_return_type,
-        "Return - Shot": listbox_return_shot,
-        "Return - Outcome": listbox_return_outcome,
-        "Point Winner": listbox_point_winner,
-        "End - Type": listbox_end_type,
-        "End - Shot": listbox_end_shot,
-        "End - Outcome": listbox_end_outcome,
-        "Strategy - Position": listbox_strategy_position,
-        "Strategy - Play Style": listbox_strategy_play_style
-    }
-
-    for label, listbox in listboxes.items():
-        # Get the currently selected (active) item
-        active_item = listbox.get(tk.ACTIVE)
-
-        # Check if the listbox has an active item selected (not None or empty)
-        if active_item:
-            data[label] = active_item
-        else:
-            data[label] = None  # Or skip this list if nothing is selected
-
-    # Now 'data' contains only active selections where the cursor landed on a listbox
-    print(data)
-    return data
-
-    """Function to handle the form submission"""
-    data = {}
-
-    # List of listboxes and their respective labels for key names
-    listboxes = {
-        "1st Serve Direction": listbox_1st_direction,
-        "1st Serve Result": listbox_1st_result,
-        "2nd Serve Direction": listbox_2nd_direction,
-        "2nd Serve Result": listbox_2nd_result,
-        "Return - Type": listbox_return_type,
-        "Return - Shot": listbox_return_shot,
-        "Return - Outcome": listbox_return_outcome,
-        "Point Winner": listbox_point_winner,
-        "End - Type": listbox_end_type,
-        "End - Shot": listbox_end_shot,
-        "End - Outcome": listbox_end_outcome,
-        "Strategy - Position": listbox_strategy_position,
-        "Strategy - Play Style": listbox_strategy_play_style
-    }
-
-    for label, listbox in listboxes.items():
-        active_item = listbox.get(tk.ACTIVE)
-        
-        # Check if there's an active item selected
-        if active_item:
-            data[label] = active_item
-        else:
-            data[label] = None  # Or handle this case differently if you want to do something else
-
-    # Now 'data' contains only valid selections with the cursor in active position.
-    print(data)
-    return data
-
-    """Function to handle the form submission"""
+    data = get_current_data()
+    """Retrieves the currently selected data from all listboxes."""
     data = {
-        "1st Serve Direction": listbox_1st_direction.get(tk.ACTIVE),
-        "1st Serve Result": listbox_1st_result.get(tk.ACTIVE),
-        "2nd Serve Direction": listbox_2nd_direction.get(tk.ACTIVE),
-        "2nd Serve Result": listbox_2nd_result.get(tk.ACTIVE),
-        "Return - Type": listbox_return_type.get(tk.ACTIVE),
-        "Return - Shot": listbox_return_shot.get(tk.ACTIVE),
-        "Return - Outcome": listbox_return_outcome.get(tk.ACTIVE),
-        "Point Winner": listbox_point_winner.get(tk.ACTIVE),
-        "End - Type": listbox_end_type.get(tk.ACTIVE),
-        "End - Shot": listbox_end_shot.get(tk.ACTIVE),
-        "End - Outcome": listbox_end_outcome.get(tk.ACTIVE),
-        "Strategy - Position": listbox_strategy_position.get(tk.ACTIVE),
-        "Strategy - Play Style": listbox_strategy_play_style.get(tk.ACTIVE)
+        "1st": (listbox_1st_direction.get(tk.ACTIVE) if listbox_1st_direction.curselection() else "") + (listbox_1st_result.get(tk.ACTIVE) if listbox_1st_result.curselection() else ""),
+        "2nd": (listbox_2nd_direction.get(tk.ACTIVE) if listbox_2nd_direction.curselection() else "") + (listbox_2nd_result.get(tk.ACTIVE) if listbox_2nd_result.curselection() else ""),
+        "Return": (listbox_return_type.get(tk.ACTIVE) if listbox_return_type.curselection() else "") + ' ' +  (listbox_return_shot.get(tk.ACTIVE) if listbox_return_shot.curselection() else "") + ' ' + (listbox_return_outcome.get(tk.ACTIVE) if listbox_return_outcome.curselection() else ""),
+        "PointWinner": listbox_point_winner.get(tk.ACTIVE) if listbox_point_winner.curselection() else "",
+        "End": (listbox_end_type.get(tk.ACTIVE) if listbox_end_type.curselection() else "") + (listbox_end_shot.get(tk.ACTIVE) if listbox_end_shot.curselection() else "") + (listbox_end_outcome.get(tk.ACTIVE) if listbox_end_outcome.curselection() else ""),
+        "Strategy": (listbox_strategy_position.get(tk.ACTIVE) if listbox_strategy_position.curselection() else "") + (listbox_strategy_play_style.get(tk.ACTIVE) if listbox_strategy_play_style.curselection() else ""),
     }
-
     for item in data.items():
-        print(item)
+        key, value = item
+        if value != '':
+            print(f"{key}:{value}", end=', ', sep=' ')
+    return data
 
-    # Display the form data in a message box
-    messagebox.showinfo("Form Submitted", f"Data Entered:\n{data}")
+    
 
 def focus_listbox(listbox):
     """Helper function to apply focus styling to a listbox"""

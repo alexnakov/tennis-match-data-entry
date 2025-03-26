@@ -102,28 +102,6 @@ def on_listbox_select(event):
     if listbox.curselection():
         index = int(listbox.curselection()[0])
         listbox.itemconfig(index, bg=my_lightblue)
-    """Handles the up arrow key press for listbox wrap-around."""
-    listbox = event.widget
-    current_index = listbox.curselection()
-
-    if current_index:
-        current_index = int(current_index[0])
-        if current_index == 0:
-            # Select the last item
-            listbox.selection_clear(0, tk.END)
-            listbox.activate(listbox.size() - 1)
-            listbox.selection_set(listbox.size() - 1)
-            listbox.see(listbox.size() - 1) # Ensure the last item is visible
-            # Update the visual highlight (optional, depending on your highlight logic)
-            on_listbox_select(event)
-        elif current_index > 0:
-            # Move selection up normally
-            listbox.selection_clear(current_index)
-            listbox.activate(current_index - 1)
-            listbox.selection_set(current_index - 1)
-            listbox.see(current_index - 1) # Ensure the previous item is visible
-            # Update the visual highlight
-            on_listbox_select(event)
 
 # Main app window
 app = tk.Tk()
@@ -329,7 +307,6 @@ submit_btn = tk.Button(bottom_frame, text="Submit", command=submit_data, bg="#4C
 submit_btn.grid(row=4, column=0, columnspan=8, pady=15)
 
 listbox_1st_direction.focus_set()
-
 
 # Create a simple object with a 'widget' attribute
 class FakeEvent:

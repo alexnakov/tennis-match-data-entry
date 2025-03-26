@@ -5,6 +5,73 @@ my_lightblue = '#b2d6fe'
 
 def submit_data():
     """Function to handle the form submission"""
+    data = {}
+
+    # List of listboxes and their respective labels for key names
+    listboxes = {
+        "1st Serve Direction": listbox_1st_direction,
+        "1st Serve Result": listbox_1st_result,
+        "2nd Serve Direction": listbox_2nd_direction,
+        "2nd Serve Result": listbox_2nd_result,
+        "Return - Type": listbox_return_type,
+        "Return - Shot": listbox_return_shot,
+        "Return - Outcome": listbox_return_outcome,
+        "Point Winner": listbox_point_winner,
+        "End - Type": listbox_end_type,
+        "End - Shot": listbox_end_shot,
+        "End - Outcome": listbox_end_outcome,
+        "Strategy - Position": listbox_strategy_position,
+        "Strategy - Play Style": listbox_strategy_play_style
+    }
+
+    for label, listbox in listboxes.items():
+        # Get the currently selected (active) item
+        active_item = listbox.get(tk.ACTIVE)
+
+        # Check if the listbox has an active item selected (not None or empty)
+        if active_item:
+            data[label] = active_item
+        else:
+            data[label] = None  # Or skip this list if nothing is selected
+
+    # Now 'data' contains only active selections where the cursor landed on a listbox
+    print(data)
+    return data
+
+    """Function to handle the form submission"""
+    data = {}
+
+    # List of listboxes and their respective labels for key names
+    listboxes = {
+        "1st Serve Direction": listbox_1st_direction,
+        "1st Serve Result": listbox_1st_result,
+        "2nd Serve Direction": listbox_2nd_direction,
+        "2nd Serve Result": listbox_2nd_result,
+        "Return - Type": listbox_return_type,
+        "Return - Shot": listbox_return_shot,
+        "Return - Outcome": listbox_return_outcome,
+        "Point Winner": listbox_point_winner,
+        "End - Type": listbox_end_type,
+        "End - Shot": listbox_end_shot,
+        "End - Outcome": listbox_end_outcome,
+        "Strategy - Position": listbox_strategy_position,
+        "Strategy - Play Style": listbox_strategy_play_style
+    }
+
+    for label, listbox in listboxes.items():
+        active_item = listbox.get(tk.ACTIVE)
+        
+        # Check if there's an active item selected
+        if active_item:
+            data[label] = active_item
+        else:
+            data[label] = None  # Or handle this case differently if you want to do something else
+
+    # Now 'data' contains only valid selections with the cursor in active position.
+    print(data)
+    return data
+
+    """Function to handle the form submission"""
     data = {
         "1st Serve Direction": listbox_1st_direction.get(tk.ACTIVE),
         "1st Serve Result": listbox_1st_result.get(tk.ACTIVE),
@@ -20,6 +87,9 @@ def submit_data():
         "Strategy - Position": listbox_strategy_position.get(tk.ACTIVE),
         "Strategy - Play Style": listbox_strategy_play_style.get(tk.ACTIVE)
     }
+
+    for item in data.items():
+        print(item)
 
     # Display the form data in a message box
     messagebox.showinfo("Form Submitted", f"Data Entered:\n{data}")

@@ -42,6 +42,87 @@ def unfocus_listbox(listbox, last_active_index):
         listbox.itemconfig(last_active_index, bg=my_lightblue)
 
 def move_focus(event):
+    """Move the focus between listboxes when left or right arrow is pressed, with special cases for 'In Net' in 1st Serve Direction, 'In' in 1st Serve Result, and 'Ace' or 'Winner' in 1st Serve Result, and visual indication of skip. Also handles wrap-around with single Up Arrow."""
+    current_widget = event.widget
+    next_widget = None
+    previous_widget = None
+    listboxes = [
+        listbox_1st_direction, listbox_1st_result,
+        listbox_2nd_direction, listbox_2nd_result,
+        listbox_return_type, listbox_return_shot,
+        listbox_return_outcome, listbox_point_winner,
+        listbox_end_type, listbox_end_shot,
+        listbox_end_outcome, listbox_strategy_position,
+        listbox_strategy_play_style
+    ]
+    num_listboxes = len(listboxes)
+    current_index = listboxes.index(current_widget)
+
+    # Unhighlight the current listbox
+    active_index = current_widget.index(tk.ACTIVE) if current_widget.size() > 0 else None
+    unfocus_listbox(current_widget, active_index)
+
+    if event.keysym == "Right":
+        # Special case for 'In Net' in the first serve direction
+        if current_widget == listbox_1st_direction:
+            active_first_serve_index = listbox_1st_direction.index(tk.ACTIVE)
+            if active_first_serve_index != -1 and listbox_1st_direction.get(active_first_serve_index) == "In Net":
+                next_widget = listbox_2nd_direction
+                listbox_1st_result.config(bg="lightgray")  # Set background to light gray when skipped
+            else:
+                next_index = current_index + 1
+                if next_index < num_listboxes:
+                    next_widget = listboxes[next_index]
+                    # Reset background if moving away normally
+                    if next_widget == listbox_1st_result:
+                        listbox_1st_result.config(bg="white")
+        # Special case for 'In', 'Ace', or 'Winner' in the first serve result
+        elif current_widget == listbox_1st_result:
+            active_first_result_index = listbox_1st_result.index(tk.ACTIVE)
+            if active_first_result_index != -1:
+                selected_result = listbox_1st_result.get(active_first_result_index)
+                if selected_result == "In":
+                    next_widget = listbox_return_type
+                    listbox_2nd_direction.config(bg="lightgray") # Indicate skip
+                    listbox_2nd_result.config(bg="lightgray") # Indicate skip
+                elif selected_result == "Ace" or selected_result == "Winner":
+                    next_widget = listbox_point_winner
+                    listbox_2nd_direction.config(bg="lightgray") # Indicate skip
+                    listbox_2nd_result.config(bg="lightgray") # Indicate skip
+                    listbox_return_type.config(bg="lightgray") # Indicate skip
+                    listbox_return_shot.config(bg="lightgray") # Indicate skip
+                    listbox_return_outcome.config(bg="lightgray") # Indicate skip
+                else:
+                    next_index = current_index + 1
+                    if next_index < num_listboxes:
+                        next_widget = listboxes[next_index]
+                # Reset background if moving away normally
+                if current_widget == listbox_1st_result and next_widget != listbox_return_type and next_widget != listbox_point_winner:
+                    listbox_1st_result.config(bg="white")
+    elif event.keysym == "Left":
+        previous_index = current_index - 1
+        if previous_index >= 0:
+            next_widget = listboxes[previous_index]
+            # Reset background if moving back to the skipped listbox
+            if next_widget == listbox_1st_result:
+                listbox_1st_result.config(bg="white")
+            elif current_widget == listbox_2nd_direction:
+                listbox_1st_result.config(bg="lightgray") # Keep it gray if skipping again
+    elif event.keysym == "Up":
+        if isinstance(current_widget, tk.Listbox):
+            active_index_up = current_widget.index(tk.ACTIVE)
+            if active_index_up == 0 and current_widget.size() > 1:  # Check if at the top and has more than one item
+                last_index = current_widget.size() - 1
+                current_widget.activate(last_index)
+                current_widget.selection_clear(0, tk.END)
+                current_widget.selection_set(last_index)
+                for i in range(current_widget.size()):
+                    current_widget.itemconfig(i, bg=current_widget.cget("background"))
+                current_widget.itemconfig(last_index, bg=my_lightblue)
+
+    if next_widget:
+        next_widget.focus_set()
+        focus_listbox(next_widget)
     """Move the focus between listboxes when left or right arrow is pressed, with special cases for 'In Net' in 1st Serve Direction and 'In' in 1st Serve Result, and visual indication of skip. Also handles wrap-around with single Up Arrow."""
     current_widget = event.widget
     next_widget = None
@@ -77,18 +158,30 @@ def move_focus(event):
                     if next_widget == listbox_1st_result:
                         listbox_1st_result.config(bg="white")
         # Special case for 'In' in the first serve result
+        # Special case for 'In', 'Ace', or 'Winner' in the first serve result
         elif current_widget == listbox_1st_result:
             active_first_result_index = listbox_1st_result.index(tk.ACTIVE)
-            if active_first_result_index != -1 and listbox_1st_result.get(active_first_result_index) == "In":
-                next_widget = listbox_return_type
-                listbox_2nd_direction.config(bg="lightgray") # Indicate skip
-                listbox_2nd_result.config(bg="lightgray") # Indicate skip
-            else:
-                next_index = current_index + 1
-                if next_index < num_listboxes:
-                    next_widget = listboxes[next_index]
+            if active_first_result_index != -1:
+                selected_result = listbox_1st_result.get(active_first_result_index)
+                if selected_result == "In":
+                    next_widget = listbox_return_type
+                    listbox_2nd_direction.config(bg="lightgray") # Indicate skip
+                    listbox_2nd_result.config(bg="lightgray") # Indicate skip
+                elif selected_result == "Ace" or selected_result == "Winner":
+                    listbox_2nd_direction.config(bg="lightgray") # Indicate skip
+                    listbox_2nd_result.config(bg="lightgray") # Indicate skip
+                    listbox_return_type.config(bg="lightgray") # Indicate skip
+                    listbox_return_shot.config(bg="lightgray") # Indicate skip
+                    listbox_return_outcome.config(bg="lightgray") # Indicate skip
+                    listbox_point_winner.focus_set()
+                    focus_listbox(listbox_point_winner)
+                    return  # Exit to prevent further processing
+                else:
+                    next_index = current_index + 1
+                    if next_index < num_listboxes:
+                        next_widget = listboxes[next_index]
                 # Reset background if moving away normally
-                if current_widget == listbox_1st_result:
+                if current_widget == listbox_1st_result and next_widget != listbox_return_type and next_widget != listbox_point_winner:
                     listbox_1st_result.config(bg="white")
     elif event.keysym == "Left":
         previous_index = current_index - 1

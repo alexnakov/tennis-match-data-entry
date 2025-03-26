@@ -42,7 +42,7 @@ def unfocus_listbox(listbox, last_active_index):
         listbox.itemconfig(last_active_index, bg=my_lightblue)
 
 def move_focus(event):
-    """Move the focus between listboxes when left or right arrow is pressed"""
+    """Move the focus between listboxes when left or right arrow is pressed, with a special case for 'In Net' and visual indication of skip."""
     current_widget = event.widget
     next_widget = None
     previous_widget = None
@@ -63,13 +63,35 @@ def move_focus(event):
     unfocus_listbox(current_widget, active_index)
 
     if event.keysym == "Right":
-        next_index = current_index + 1
-        if next_index < num_listboxes:
-            next_widget = listboxes[next_index]
+        # Special case for 'In Net' in the first serve direction
+        if current_widget == listbox_1st_direction:
+            active_first_serve_index = listbox_1st_direction.index(tk.ACTIVE)
+            if active_first_serve_index != -1 and listbox_1st_direction.get(active_first_serve_index) == "In Net":
+                next_widget = listbox_2nd_direction
+                listbox_1st_result.config(bg="lightgray")  # Set background to light gray when skipped
+            else:
+                next_index = current_index + 1
+                if next_index < num_listboxes:
+                    next_widget = listboxes[next_index]
+                    # Reset background if moving away normally
+                    if next_widget == listbox_1st_result:
+                        listbox_1st_result.config(bg="white")
+        else:
+            next_index = current_index + 1
+            if next_index < num_listboxes:
+                next_widget = listboxes[next_index]
+                # Reset background if moving away normally
+                if current_widget == listbox_1st_result:
+                    listbox_1st_result.config(bg="white")
     elif event.keysym == "Left":
         previous_index = current_index - 1
         if previous_index >= 0:
             next_widget = listboxes[previous_index]
+            # Reset background if moving back to the skipped listbox
+            if next_widget == listbox_1st_result:
+                listbox_1st_result.config(bg="white")
+            elif current_widget == listbox_2nd_direction:
+                listbox_1st_result.config(bg="lightgray") # Keep it gray if skipping again
 
     if next_widget:
         next_widget.focus_set()
@@ -95,7 +117,7 @@ def on_focus_in(event):
             listbox.itemconfig(0, bg=my_lightblue)
 
 def on_listbox_select(event):
-    """Handle selection change in a listbox to highlight the active item"""
+    """Handle selection change in a listbox to highlight the active item and implement special navigation for 'In Net'."""
     listbox = event.widget
     for i in range(listbox.size()):
         listbox.itemconfig(i, bg=listbox.cget("background")) # Reset all to listbox background

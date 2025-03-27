@@ -39,8 +39,13 @@ def submit_data():
         if value != '':
             print(f"{key}:{value}", end=', ', sep=' ')
     return data
-
-    
+    """Resets all listboxes."""
+    for lb in listboxes_widgets:
+        lb.selection_clear(0, tk.END)
+        for i in range(lb.size()):
+            lb.itemconfig(i, bg="white")
+    listbox_1st_direction.focus_set()
+    focus_listbox(listbox_1st_direction)  
 
 def focus_listbox(listbox):
     """Helper function to apply focus styling to a listbox"""
@@ -666,6 +671,7 @@ def on_listbox_select(event):
     if listbox.curselection():
         index = int(listbox.curselection()[0])
         listbox.itemconfig(index, bg=my_lightblue)
+
 
 # Main app window
 app = tk.Tk()

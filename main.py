@@ -83,7 +83,7 @@ def move_focus_left(event):
     active_index = current_widget.index(tk.ACTIVE) if current_widget.size() > 0 else None
     unfocus_listbox(current_widget, active_index)
 
-    next_widget = current_index - 1
+    next_widget = listboxes[current_index - 1]
     next_widget.focus_set()
     focus_listbox(next_widget)
 

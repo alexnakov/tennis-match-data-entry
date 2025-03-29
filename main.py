@@ -3,6 +3,236 @@ from tkinter import messagebox
 
 my_lightblue = '#b2d6fe'
 
+def get_current_data():
+    """Retrieves the currently selected data from all listboxes."""
+    data = {
+        "1st": (listbox_1st_direction.get(tk.ACTIVE) if listbox_1st_direction.curselection() else "Wide") + ' ' + (listbox_1st_result.get(tk.ACTIVE) if listbox_1st_result.curselection() else ""),
+        "2nd": (listbox_2nd_direction.get(tk.ACTIVE) if listbox_2nd_direction.curselection() else "") + ' ' + (listbox_2nd_result.get(tk.ACTIVE) if listbox_2nd_result.curselection() else ""), 
+        "Return": (listbox_return_type.get(tk.ACTIVE) if listbox_return_type.curselection() else "") + ' ' + (listbox_return_shot.get(tk.ACTIVE) if listbox_return_shot.curselection() else "") + ' ' + (listbox_return_outcome.get(tk.ACTIVE) if listbox_return_outcome.curselection() else ""),
+        "Winner": listbox_point_winner.get(tk.ACTIVE) if listbox_point_winner.curselection() else "",
+        "End": (listbox_end_type.get(tk.ACTIVE) if listbox_end_type.curselection() else "") + ' ' + (listbox_end_shot.get(tk.ACTIVE) if listbox_end_shot.curselection() else "") + ' ' + (listbox_end_outcome.get(tk.ACTIVE) if listbox_end_outcome.curselection() else ""),
+        "Strategy": (listbox_strategy_position.get(tk.ACTIVE) if listbox_strategy_position.curselection() else "") + (listbox_strategy_play_style.get(tk.ACTIVE) if listbox_strategy_play_style.curselection() else ""),
+    }
+    
+    return data
+
+def display_stats(event=None):
+    """Display the selected stats in the top Text widget."""
+    data = get_current_data()
+    data = {key: value for key, value in data.items() if value.strip()}
+    stats = ";  ".join([f"{key}: {value}" for key, value in data.items() if value])
+    if stats:
+        stats_display.insert(tk.END, stats + "\n")
+        stats_display.see(tk.END)  # Scroll to the latest entry
+
+    point_winner = data.get("Winner")
+    if point_winner == "A":
+        scoring_section.add_point("A")
+    elif point_winner == "B":
+        scoring_section.add_point("B")
+
+    listboxes_widgets = [
+        listbox_1st_direction, listbox_1st_result,
+        listbox_2nd_direction, listbox_2nd_result,
+        listbox_return_type, listbox_return_shot,
+        listbox_return_outcome, listbox_point_winner,
+        listbox_end_type, listbox_end_shot,
+        listbox_end_outcome, listbox_strategy_position,
+        listbox_strategy_play_style
+    ]
+    for lb in listboxes_widgets:
+        lb.selection_clear(0, tk.END)
+        lb.config(bg='white')
+        for i in range(lb.size()):
+            lb.itemconfig(i, bg="white")
+    listbox_1st_direction.focus_set()
+    focus_listbox(listbox_1st_direction)  
+
+def focus_listbox(listbox):
+    """Helper function to apply focus styling to a listbox"""
+    listbox.config(bg="lightgreen")
+    if listbox.size() > 0:
+        listbox.activate(0)  # Select the top item
+        listbox.selection_clear(0, tk.END)
+        listbox.selection_set(0)
+        listbox.itemconfig(0, bg=my_lightblue)
+
+def unfocus_listbox(listbox, last_active_index):
+    """Helper function to remove focus styling and highlight the last active item"""
+    listbox.config(bg="white")
+    for i in range(listbox.size()):
+        listbox.itemconfig(i, bg="white")
+    if last_active_index is not None and 0 <= last_active_index < listbox.size():
+        listbox.itemconfig(last_active_index, bg=my_lightblue)
+
+def move_focus_left(event):
+    current_widget = event.widget
+    next_widget = None
+    listboxes = [
+        listbox_1st_direction, listbox_1st_result,
+        listbox_2nd_direction, listbox_2nd_result,
+        listbox_return_type, listbox_return_shot,
+        listbox_return_outcome, listbox_point_winner,
+        listbox_end_type, listbox_end_shot,
+        listbox_end_outcome, listbox_strategy_position,
+        listbox_strategy_play_style
+    ]
+    current_index = listboxes.index(current_widget)
+
+    # Unhighlight the current listbox
+    active_index = current_widget.index(tk.ACTIVE) if current_widget.size() > 0 else None
+    unfocus_listbox(current_widget, active_index)
+
+    next_widget = current_index - 1
+    next_widget.focus_set()
+    focus_listbox(next_widget)
+
+def move_focus_right(event):
+    current_widget = event.widget
+    next_widget = None
+    listboxes = [
+        listbox_1st_direction, listbox_1st_result,
+        listbox_2nd_direction, listbox_2nd_result,
+        listbox_return_type, listbox_return_shot,
+        listbox_return_outcome, listbox_point_winner,
+        listbox_end_type, listbox_end_shot,
+        listbox_end_outcome, listbox_strategy_position,
+        listbox_strategy_play_style
+    ]
+    num_listboxes = len(listboxes)
+    current_index = listboxes.index(current_widget)
+
+    # The following 2 lines 'unfocus' the current listbox.
+    active_index = current_widget.index(tk.ACTIVE) if current_widget.size() > 0 else None
+    unfocus_listbox(current_widget, active_index)
+
+    if current_widget == listbox_1st_direction:
+        active_first_serve_index = listbox_1st_direction.index(tk.ACTIVE)
+        if active_first_serve_index != -1 and listbox_1st_direction.get(active_first_serve_index) == "In Net":
+            next_widget = listbox_2nd_direction
+            listbox_1st_result.config(bg="lightgray")  # Set background to light gray when skipped
+            for i in range(listbox_1st_result.size()):
+                listbox_1st_result.itemconfig(i, bg="lightgray")
+            next_widget.focus_set()
+            focus_listbox(next_widget)        
+        else:
+            next_widget = listbox_1st_result
+            next_widget.focus_set()
+            focus_listbox(next_widget)
+    elif current_widget == listbox_1st_result:
+        active_first_result_index = listbox_1st_result.index(tk.ACTIVE)
+        if active_first_result_index != -1: # If is not 'fault'
+            selected_result = listbox_1st_result.get(active_first_result_index)
+            if selected_result == "In": # If 1st serve goes 'In' but not ace, skip to return
+                listbox_2nd_direction.config(bg="lightgray")
+                listbox_2nd_result.config(bg="lightgray")
+                for i in range(listbox_2nd_direction.size()):
+                    listbox_2nd_direction.itemconfig(i, bg="lightgray")
+                for i in range(listbox_2nd_result.size()):
+                    listbox_2nd_result.itemconfig(i, bg="lightgray")
+                
+                next_widget = listbox_return_type
+                listbox_return_type.focus_set()
+                focus_listbox(listbox_return_type)
+            elif selected_result == "Ace" or selected_result == "Winner":
+                listbox_2nd_direction.config(bg="lightgray") # Indicate skip
+                listbox_2nd_result.config(bg="lightgray") # Indicate skip
+                listbox_return_type.config(bg="lightgray") # Indicate skip
+                listbox_return_shot.config(bg="lightgray") # Indicate skip
+                listbox_return_outcome.config(bg="lightgray") # Indicate skip
+                for i in range(listbox_2nd_direction.size()):
+                    listbox_2nd_direction.itemconfig(i, bg="lightgray")
+                for i in range(listbox_2nd_result.size()):
+                    listbox_2nd_result.itemconfig(i, bg="lightgray")
+                for i in range(listbox_return_type.size()):
+                    listbox_return_type.itemconfig(i, bg="lightgray")
+                for i in range(listbox_return_shot.size()):
+                    listbox_return_shot.itemconfig(i, bg="lightgray")    
+                for i in range(listbox_return_outcome.size()):
+                    listbox_return_outcome.itemconfig(i, bg="lightgray")    
+
+                listbox_point_winner.focus_set()
+                focus_listbox(listbox_point_winner)
+                return  
+            else: # If fault, move to 2nd serve
+                next_index = current_index + 1
+                if next_index < num_listboxes:
+                    next_widget = listboxes[next_index]
+                    next_widget.focus_set()
+                    focus_listbox(next_widget) 
+    elif current_widget == listbox_2nd_direction:
+        active_second_serve_index = listbox_2nd_direction.index(tk.ACTIVE)
+        if active_second_serve_index != -1 and listbox_2nd_direction.get(active_second_serve_index) == "In Net":
+            listbox_2nd_result.config(bg="lightgray") # Indicate skip
+            listbox_return_type.config(bg="lightgray") # Indicate skip
+            listbox_return_shot.config(bg="lightgray") # Indicate skip
+            listbox_return_outcome.config(bg="lightgray") # Indicate skip
+            listbox_point_winner.focus_set()
+            focus_listbox(listbox_point_winner)
+            return  # Exit to prevent further processing
+        else:
+            next_widget = listbox_2nd_result
+            next_widget.focus_set()
+            focus_listbox(next_widget)  
+    elif current_widget == listbox_2nd_result:
+        active_second_result_index = listbox_2nd_result.index(tk.ACTIVE)
+        if active_second_result_index != -1 and listbox_2nd_result.get(active_second_result_index) in ['Ace','Winner', 'Fault']:
+            listbox_return_type.config(bg="lightgray") # Indicate skip
+            listbox_return_shot.config(bg="lightgray") # Indicate skip
+            listbox_return_outcome.config(bg="lightgray") # Indicate skip
+            for i in range(listbox_return_type.size()):
+                    listbox_return_type.itemconfig(i, bg="lightgray")
+            for i in range(listbox_return_shot.size()):
+                listbox_return_shot.itemconfig(i, bg="lightgray")
+            for i in range(listbox_return_outcome.size()):
+                listbox_return_outcome.itemconfig(i, bg="lightgray")
+
+            listbox_point_winner.focus_set()
+            focus_listbox(listbox_point_winner)
+        else:
+            next_index = current_index + 1
+            if next_index < num_listboxes:
+                next_widget = listboxes[next_index]
+                next_widget.focus_set()
+                focus_listbox(next_widget)
+    else:
+        next_index = current_index + 1
+        if next_index < num_listboxes:
+            next_widget = listboxes[next_index]
+            next_widget.focus_set()
+            focus_listbox(next_widget)
+
+def move_focus_up(event):
+    pass
+
+def on_focus_in(event):
+    """Handle focus entering a listbox"""
+    listbox = event.widget
+    listbox.config(bg="lightgreen")
+    if listbox.size() > 0:
+        active_index = listbox.index(tk.ACTIVE)
+        if active_index != -1:
+            # Clear previous blue highlights
+            for i in range(listbox.size()):
+                listbox.itemconfig(i, bg=listbox.cget("background"))
+            # Highlight the active item in blue
+            listbox.itemconfig(active_index, bg=my_lightblue)
+        else:
+            # If no item is active, highlight the first item in blue
+            listbox.activate(0)
+            listbox.selection_clear(0, tk.END)
+            listbox.selection_set(0)
+            listbox.itemconfig(0, bg=my_lightblue)
+
+def on_listbox_select(event):
+    """Handle selection change in a listbox to highlight the active item and implement special navigation for 'In Net'."""
+    listbox = event.widget
+    for i in range(listbox.size()):
+        listbox.itemconfig(i, bg=listbox.cget("background")) # Reset all to listbox background
+    if listbox.curselection():
+        index = int(listbox.curselection()[0])
+        listbox.itemconfig(index, bg=my_lightblue)
+
 class CustomListbox(tk.Listbox):
     """Custom Listbox class to encapsulate behavior."""
     def __init__(self, parent, items, width, row, column, **kwargs):
@@ -36,308 +266,54 @@ class CustomListbox(tk.Listbox):
             index = int(self.curselection()[0])
             self.itemconfig(index, bg=my_lightblue)
 
-def get_current_data():
-    """Retrieves the currently selected data from all listboxes."""
-    data = {
-        "1st": (listbox_1st_direction.get(tk.ACTIVE) if listbox_1st_direction.curselection() else "Wide") + ' ' + (listbox_1st_result.get(tk.ACTIVE) if listbox_1st_result.curselection() else ""),
-        "2nd": (listbox_2nd_direction.get(tk.ACTIVE) if listbox_2nd_direction.curselection() else "") + ' ' + (listbox_2nd_result.get(tk.ACTIVE) if listbox_2nd_result.curselection() else ""), 
-        "Return": (listbox_return_type.get(tk.ACTIVE) if listbox_return_type.curselection() else "") + ' ' + (listbox_return_shot.get(tk.ACTIVE) if listbox_return_shot.curselection() else "") + ' ' + (listbox_return_outcome.get(tk.ACTIVE) if listbox_return_outcome.curselection() else ""),
-        "Winner": listbox_point_winner.get(tk.ACTIVE) if listbox_point_winner.curselection() else "",
-        "End": (listbox_end_type.get(tk.ACTIVE) if listbox_end_type.curselection() else "") + ' ' + (listbox_end_shot.get(tk.ACTIVE) if listbox_end_shot.curselection() else "") + ' ' + (listbox_end_outcome.get(tk.ACTIVE) if listbox_end_outcome.curselection() else ""),
-        "Strategy": (listbox_strategy_position.get(tk.ACTIVE) if listbox_strategy_position.curselection() else "") + (listbox_strategy_play_style.get(tk.ACTIVE) if listbox_strategy_play_style.curselection() else ""),
-    }
-    
-    return data
+class EnterConfirmation:
+    def __init__(self, root):
+        self.root = root
+        # Variable to track if confirmation pop-up is open
+        self.confirmation_active = False
+        
+        # Label for instructions
+        self.label = tk.Label(root, text="Press Enter to confirm results.", font=("Helvetica", 14))
+        self.label.pack(pady=20)
 
-def display_stats(event=None):
-    """Display the selected stats in the top Text widget."""
-    data = get_current_data()
-    data = {key: value for key, value in data.items() if value.strip()}
-    stats = ";      ".join([f"{key}: {value}" for key, value in data.items() if value])
-    if stats:
-        stats_display.insert(tk.END, stats + "\n")
-        stats_display.see(tk.END)  # Scroll to the latest entry
-    listboxes_widgets = [
-        listbox_1st_direction, listbox_1st_result,
-        listbox_2nd_direction, listbox_2nd_result,
-        listbox_return_type, listbox_return_shot,
-        listbox_return_outcome, listbox_point_winner,
-        listbox_end_type, listbox_end_shot,
-        listbox_end_outcome, listbox_strategy_position,
-        listbox_strategy_play_style
-    ]
-    point_winner = data.get("Winner")
+        # Bind Enter key to show confirmation pop-up
+        self.root.bind('<Return>', self.show_confirmation)
 
-    # Update the score based on the point winner
-    if point_winner == "A":
-        scoring_section.add_point("A")
-    elif point_winner == "B":
-        scoring_section.add_point("B")
-    for lb in listboxes_widgets:
-        lb.selection_clear(0, tk.END)
-        for i in range(lb.size()):
-            lb.itemconfig(i, bg="white")
-    listbox_1st_direction.focus_set()
-    focus_listbox(listbox_1st_direction)  
+    def show_confirmation(self, event):
+        """Handles the first Enter press (shows confirmation pop-up)"""
+        if not self.confirmation_active:
+            self.confirmation_active = True  # Mark the pop-up as active
 
-def focus_listbox(listbox):
-    """Helper function to apply focus styling to a listbox"""
-    listbox.config(bg="lightgreen")
-    if listbox.size() > 0:
-        listbox.activate(0)  # Select the top item
-        listbox.selection_clear(0, tk.END)
-        listbox.selection_set(0)
-        listbox.itemconfig(0, bg=my_lightblue)
+            # Create confirmation window
+            self.popup = tk.Toplevel(self.root)
+            self.popup.title("Confirmation")
+            self.popup.geometry("350x150")
+            
+            label = tk.Label(self.popup, text="Are you sure you want to enter these results?", font=("Helvetica", 12))
+            label.pack(pady=10)
 
-def unfocus_listbox(listbox, last_active_index):
-    """Helper function to remove focus styling and highlight the last active item"""
-    listbox.config(bg="white")
-    for i in range(listbox.size()):
-        listbox.itemconfig(i, bg="white")
-    if last_active_index is not None and 0 <= last_active_index < listbox.size():
-        listbox.itemconfig(last_active_index, bg=my_lightblue)
+            # Bind Enter key to confirm action
+            self.popup.bind('<Return>', self.enter_results)
 
-def move_focus_left(event):
-    current_widget = event.widget
-    next_widget = None
-    previous_widget = None
-    listboxes = [
-        listbox_1st_direction, listbox_1st_result,
-        listbox_2nd_direction, listbox_2nd_result,
-        listbox_return_type, listbox_return_shot,
-        listbox_return_outcome, listbox_point_winner,
-        listbox_end_type, listbox_end_shot,
-        listbox_end_outcome, listbox_strategy_position,
-        listbox_strategy_play_style
-    ]
-    num_listboxes = len(listboxes)
-    current_index = listboxes.index(current_widget)
+            # Handle window closing
+            self.popup.protocol("WM_DELETE_WINDOW", self.cancel_confirmation)
 
-    # Unhighlight the current listbox
-    active_index = current_widget.index(tk.ACTIVE) if current_widget.size() > 0 else None
-    unfocus_listbox(current_widget, active_index)
+    def enter_results(self, event):
+        """Handles the second Enter press (confirms the action)"""
+        display_stats()
+        self.confirmation_active = False
+        self.popup.destroy()
 
-    if event.keysym == "Left":
-        previous_index = current_index - 1
-        if previous_index >= 0:
-            next_widget = listboxes[previous_index]
-            # Reset background if moving back to the skipped listbox
-            if next_widget == listbox_1st_result:
-                listbox_1st_result.config(bg="white")
-    if next_widget:
-        next_widget.focus_set()
-        focus_listbox(next_widget)
-
-def move_focus_right(event):
-    current_widget = event.widget
-    next_widget = None
-    previous_widget = None
-    listboxes = [
-        listbox_1st_direction, listbox_1st_result,
-        listbox_2nd_direction, listbox_2nd_result,
-        listbox_return_type, listbox_return_shot,
-        listbox_return_outcome, listbox_point_winner,
-        listbox_end_type, listbox_end_shot,
-        listbox_end_outcome, listbox_strategy_position,
-        listbox_strategy_play_style
-    ]
-    num_listboxes = len(listboxes)
-    current_index = listboxes.index(current_widget)
-
-    # Unhighlight the current listbox
-    active_index = current_widget.index(tk.ACTIVE) if current_widget.size() > 0 else None
-    unfocus_listbox(current_widget, active_index)
-
-    if event.keysym == "Right":
-        if current_widget == listbox_1st_direction:
-            active_first_serve_index = listbox_1st_direction.index(tk.ACTIVE)
-            if active_first_serve_index != -1 and listbox_1st_direction.get(active_first_serve_index) == "In Net":
-                next_widget = listbox_2nd_direction
-                listbox_1st_result.config(bg="lightgray")  # Set background to light gray when skipped
-            else:
-                next_index = current_index + 1
-                if next_index < num_listboxes:
-                    next_widget = listboxes[next_index]
-                    # Reset background if moving away normally
-                    if next_widget == listbox_1st_result:
-                        listbox_1st_result.config(bg="white")
-        elif current_widget == listbox_1st_result:
-            active_first_result_index = listbox_1st_result.index(tk.ACTIVE)
-            if active_first_result_index != -1:
-                selected_result = listbox_1st_result.get(active_first_result_index)
-                if selected_result == "In":
-                    next_widget = listbox_return_type
-                    listbox_2nd_direction.config(bg="lightgray") # Indicate skip
-                    listbox_2nd_result.config(bg="lightgray") # Indicate skip
-                elif selected_result == "Ace" or selected_result == "Winner":
-                    listbox_2nd_direction.config(bg="lightgray") # Indicate skip
-                    listbox_2nd_result.config(bg="lightgray") # Indicate skip
-                    listbox_return_type.config(bg="lightgray") # Indicate skip
-                    listbox_return_shot.config(bg="lightgray") # Indicate skip
-                    listbox_return_outcome.config(bg="lightgray") # Indicate skip
-                    listbox_point_winner.focus_set()
-                    focus_listbox(listbox_point_winner)
-                    return  
-                else:
-                    next_index = current_index + 1
-                    if next_index < num_listboxes:
-                        next_widget = listboxes[next_index]
-                # Reset background if moving away normally
-                if current_widget == listbox_1st_result and next_widget != listbox_return_type and next_widget != listbox_point_winner:
-                    listbox_1st_result.config(bg="white")
-        # Special case for 'In Net' in the second serve direction
-        elif current_widget == listbox_2nd_direction:
-            active_second_serve_index = listbox_2nd_direction.index(tk.ACTIVE)
-            if active_second_serve_index != -1 and listbox_2nd_direction.get(active_second_serve_index) == "In Net":
-                listbox_2nd_result.config(bg="lightgray") # Indicate skip
-                listbox_return_type.config(bg="lightgray") # Indicate skip
-                listbox_return_shot.config(bg="lightgray") # Indicate skip
-                listbox_return_outcome.config(bg="lightgray") # Indicate skip
-                listbox_point_winner.focus_set()
-                focus_listbox(listbox_point_winner)
-                return  # Exit to prevent further processing
-            else:
-                next_index = current_index + 1
-                if next_index < num_listboxes:
-                    next_widget = listboxes[next_index]
-        # Special case for 'Fault' in the second serve result
-        elif current_widget == listbox_2nd_result:
-            active_second_result_index = listbox_2nd_result.index(tk.ACTIVE)
-            if active_second_result_index != -1 and listbox_2nd_result.get(active_second_result_index) == "Fault":
-                listbox_return_type.config(bg="lightgray") # Indicate skip
-                listbox_return_shot.config(bg="lightgray") # Indicate skip
-                listbox_return_outcome.config(bg="lightgray") # Indicate skip
-                listbox_point_winner.focus_set()
-                focus_listbox(listbox_point_winner)
-                return  # Exit to prevent further processing
-            elif active_second_result_index != -1 and listbox_2nd_result.get(active_second_result_index) in ['Ace','Winner']:
-                listbox_return_type.config(bg="lightgray") # Indicate skip
-                listbox_return_shot.config(bg="lightgray") # Indicate skip
-                listbox_return_outcome.config(bg="lightgray") # Indicate skip
-                listbox_point_winner.focus_set()
-                focus_listbox(listbox_point_winner)
-            else:
-                next_index = current_index + 1
-                if next_index < num_listboxes:
-                    next_widget = listboxes[next_index]
-        elif current_widget == listbox_2nd_result:
-            active_index = listbox_2nd_result.index(tk.ACTIVE)
-            if active_index != -1:
-                selected_value = listbox_2nd_result.get(active_index)
-                if selected_value in ["Ace", "Winner"]:
-                    # Move focus to the Point Winner listbox
-                    listbox_point_winner.focus_set()
-                    focus_listbox(listbox_point_winner)
-                    return  # Exit to prevent further processing
-
-def move_focus_up(event):
-    current_widget = event.widget
-    next_widget = None
-    previous_widget = None
-    listboxes = [
-        listbox_1st_direction, listbox_1st_result,
-        listbox_2nd_direction, listbox_2nd_result,
-        listbox_return_type, listbox_return_shot,
-        listbox_return_outcome, listbox_point_winner,
-        listbox_end_type, listbox_end_shot,
-        listbox_end_outcome, listbox_strategy_position,
-        listbox_strategy_play_style
-    ]
-    num_listboxes = len(listboxes)
-    current_index = listboxes.index(current_widget)
-
-    # Unhighlight the current listbox
-    active_index = current_widget.index(tk.ACTIVE) if current_widget.size() > 0 else None
-    unfocus_listbox(current_widget, active_index)
-
-    if event.keysym == "Up":
-        if isinstance(current_widget, tk.Listbox):
-            active_index_up = current_widget.index(tk.ACTIVE)
-            if active_index_up == 0 and current_widget.size() > 1:  # Check if at the top and has more than one item
-                last_index = current_widget.size() - 1
-                current_widget.activate(last_index)
-                current_widget.selection_clear(0, tk.END)
-                current_widget.selection_set(last_index)
-                for i in range(current_widget.size()):
-                    current_widget.itemconfig(i, bg=current_widget.cget("background"))
-                current_widget.itemconfig(last_index, bg=my_lightblue)
-
-def on_focus_in(event):
-    """Handle focus entering a listbox"""
-    listbox = event.widget
-    listbox.config(bg="lightgreen")
-    if listbox.size() > 0:
-        active_index = listbox.index(tk.ACTIVE)
-        if active_index != -1:
-            # Clear previous blue highlights
-            for i in range(listbox.size()):
-                listbox.itemconfig(i, bg=listbox.cget("background"))
-            # Highlight the active item in blue
-            listbox.itemconfig(active_index, bg=my_lightblue)
-        else:
-            # If no item is active, highlight the first item in blue
-            listbox.activate(0)
-            listbox.selection_clear(0, tk.END)
-            listbox.selection_set(0)
-            listbox.itemconfig(0, bg=my_lightblue)
-
-def on_listbox_select(event):
-    """Handle selection change in a listbox to highlight the active item and implement special navigation for 'In Net'."""
-    listbox = event.widget
-    for i in range(listbox.size()):
-        listbox.itemconfig(i, bg=listbox.cget("background")) # Reset all to listbox background
-    if listbox.curselection():
-        index = int(listbox.curselection()[0])
-        listbox.itemconfig(index, bg=my_lightblue)
-
-def ask_player_names():
-    """Pop-up window to ask for player names."""
-    def save_names():
-        """Save the entered names and update the labels."""
-        player_a_name = 'A'
-        player_b_name = 'B'
-
-        if not player_a_name or not player_b_name:
-            messagebox.showerror("Error", "Both player names must be entered!")
-            return
-
-        # Update the labels in the scoring section
-        scoring_section.player_a_label.config(text=f"{player_a_name} ●" if scoring_section.server == "A" else player_a_name)
-        scoring_section.player_b_label.config(text=f"{player_b_name} ●" if scoring_section.server == "B" else player_b_name)
-
-        # Save the names in the scoring section for future reference
-        scoring_section.player_a_name = 'A'
-        scoring_section.player_b_name = 'B'
-
-        # Close the pop-up window
-        # name_window.destroy()
-
-    # Create the pop-up window
-    # name_window = tk.Toplevel(app)
-    # name_window.title("Enter Player Names")
-    # name_window.geometry("400x400")
-    # name_window.transient(app)  # Keep it on top of the main window
-    # name_window.grab_set()  # Prevent interaction with the main window
-
-    # # Labels and entry fields for player names
-    # tk.Label(name_window, text="Enter Player A's Name:", font=("Helvetica", 12)).pack(pady=10)
-    # player_a_entry = tk.Entry(name_window, font=("Helvetica", 12))
-    # player_a_entry.pack(pady=5)
-
-    # tk.Label(name_window, text="Enter Player B's Name:", font=("Helvetica", 12)).pack(pady=10)
-    # player_b_entry = tk.Entry(name_window, font=("Helvetica", 12))
-    # player_b_entry.pack(pady=5)
-
-    # # Save button
-    # save_button = tk.Button(name_window, text="Save", command=save_names, bg="#4CAF50", fg="white", font=("Helvetica", 12, "bold"))
-    # save_button.pack(pady=15)
-
-    # # Focus on the first entry field
-    # player_a_entry.focus_set()
+    def cancel_confirmation(self):
+        """Handles closing the pop-up without confirming"""
+        self.confirmation_active = False
+        self.popup.destroy()
 
 class TennisScoring:
-    def __init__(self, parent):
+    def __init__(self, parent, player_a_name, player_b_name):
         self.parent = parent
+        self.player_a_name = player_a_name
+        self.player_b_name = player_b_name
         self.player_a_score = 0
         self.player_b_score = 0
         self.player_a_games = 0
@@ -485,12 +461,12 @@ class TennisScoring:
         self.player_b_label.config(
             text=f"{scoring_section.player_b_name}●" if self.server == "B" else f"{scoring_section.player_b_name}"
         )
+
 # Main app window
 app = tk.Tk()
 app.title("Tennis Data Entry App")
 app.geometry("1200x700")
 app.configure(bg="#f0f0f0")
-app.after(100, ask_player_names)
 
 top_frame = tk.Frame(app, height=200, bg=my_lightblue)
 top_frame.pack(side="top", fill="both", expand=True)
@@ -498,7 +474,8 @@ top_frame.pack(side="top", fill="both", expand=True)
 bottom_frame = tk.Frame(app, height=500, bg="#ffffff", relief="ridge", bd=2)
 bottom_frame.pack(side="bottom", fill="both", expand=True)
 
-scoring_section = TennisScoring(bottom_frame)
+enter_confirmation = EnterConfirmation(app)
+scoring_section = TennisScoring(bottom_frame, 'A', "B")
 
 # Add a Text widget to the top frame for displaying stats
 stats_display = tk.Text(top_frame, height=10, width=100, state="normal", bg="white", font=("Helvetica", 10))
@@ -511,7 +488,7 @@ stats_display.pack(padx=10, pady=10)
 tk.Label(bottom_frame, text="1st Serve", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=0, padx=10, pady=5, sticky="nw")
 tk.Label(bottom_frame, text="2nd Serve", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=2, padx=10, pady=5, sticky="nw")
 tk.Label(bottom_frame, text="Return", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=4, padx=10, pady=5, sticky="nw")
-tk.Label(bottom_frame, text="Point Winner", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=6, padx=10, pady=5, sticky="nw")
+tk.Label(bottom_frame, text="Point Winner", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=7, padx=10, pady=5, sticky="nw")
 
 
 # List items
@@ -543,7 +520,7 @@ listbox_2nd_result.bind("<Right>", move_focus_right)  # Bind Right arrow
 # List items for Return
 return_type_items = ["Forehand", "Backhand"]
 return_shot_items = ["Return", "Pass", "Approach", "Drop", "Lob"]
-return_outcome_items = ["Winner", "Unforced", "Forced"]
+return_outcome_items = ["In", "Winner", "Unforced", "Forced"]
 
 # --- Return - Type ---
 listbox_return_type = CustomListbox(bottom_frame, return_type_items, 10, 1, 4)
@@ -551,7 +528,7 @@ listbox_return_type.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_return_type.bind("<Right>", move_focus_right)  # Bind Right arrow
 
 # --- Return - Shot ---
-listbox_return_shot = CustomListbox(bottom_frame, return_shot_items, 12, 1, 5)
+listbox_return_shot = CustomListbox(bottom_frame, return_shot_items, 10, 1, 5)
 listbox_return_shot.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_return_shot.bind("<Right>", move_focus_right)  # Bind Right arrow
 
@@ -579,7 +556,7 @@ tk.Label(bottom_frame, text="End", font=("Helvetica", 12, "bold"), bg="#ffffff")
 # List items for End
 end_type_items = ["Forehand", "Backhand"]
 end_shot_items = ["Drive", "Volley", "Smash", "Pass", "Approach", "Lob", "Drop"]
-end_outcome_items = ["Winner", "Force", "Unforced"]
+end_outcome_items = ["Winner", "Forced", "Unforced"]
 
 # --- End - Type ---
 listbox_end_type = CustomListbox(bottom_frame, end_type_items, 10, 3, 0)
@@ -601,19 +578,19 @@ listbox_end_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
 # -------------------------
 
 # Label
-tk.Label(bottom_frame, text="Strategy", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=3, column=3, padx=10, pady=15, sticky="nw")
+tk.Label(bottom_frame, text="Strategy", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=2, column=3, padx=10, pady=15, sticky="nw")
 
 # List items for Strategy
 strategy_position_items = ["Baseline", "A at net", "B at net", "Both at net"]
 strategy_play_style_items = ["", "Serve and Volley"]
 
 # --- Strategy - Position ---
-listbox_strategy_position = CustomListbox(bottom_frame, strategy_position_items, 15, 3, 4)
+listbox_strategy_position = CustomListbox(bottom_frame, strategy_position_items, 11, 3, 3)
 listbox_strategy_position.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_strategy_position.bind("<Right>", move_focus_right)  # Bind Right arrow
 
 # --- Strategy - Play Style ---
-listbox_strategy_play_style = CustomListbox(bottom_frame, strategy_play_style_items, 15, 3, 5)
+listbox_strategy_play_style = CustomListbox(bottom_frame, strategy_play_style_items, 12, 3, 4)
 listbox_strategy_play_style.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_strategy_play_style.bind("<Right>", move_focus_right)  # Bind Right arrow
 
@@ -622,9 +599,6 @@ listbox_strategy_play_style.bind("<Right>", move_focus_right)  # Bind Right arro
 # -------------------------
 submit_btn = tk.Button(bottom_frame, text="Submit", command=display_stats, bg="#4CAF50", fg="white", font=("Helvetica", 12, "bold"))
 submit_btn.grid(row=4, column=0, columnspan=8, pady=15)
-
-# Bind the Enter key to display stats
-app.bind("<Return>", display_stats)
 
 listbox_1st_direction.focus_set()
 

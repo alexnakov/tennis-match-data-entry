@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import simpledialog
+
 
 my_lightblue = '#b2d6fe'
 
@@ -16,7 +18,7 @@ def get_current_data():
     
     return data
 
-def display_stats(event=None):
+def display_stats(player_a_name, player_b_name):
     """Display the selected stats in the top Text widget."""
     data = get_current_data()
     data = {key: value for key, value in data.items() if value.strip()}
@@ -26,10 +28,10 @@ def display_stats(event=None):
         stats_display.see(tk.END)  # Scroll to the latest entry
 
     point_winner = data.get("Winner")
-    if point_winner == "A":
-        scoring_section.add_point("A")
-    elif point_winner == "B":
-        scoring_section.add_point("B")
+    if point_winner == player_a_name:
+        scoring_section.add_point(player_a_name)
+    elif point_winner == player_b_name:
+        scoring_section.add_point(player_b_name)
 
     listboxes_widgets = [
         listbox_1st_direction, listbox_1st_result,
@@ -266,9 +268,11 @@ class CustomListbox(tk.Listbox):
             index = int(self.curselection()[0])
             self.itemconfig(index, bg=my_lightblue)
 
-class EnterConfirmation:
-    def __init__(self, root):
+class EnterConfirmation():
+    def __init__(self, root, player_a_name, player_b_name):
         self.root = root
+        self.player_a_name = player_a_name
+        self.player_b_name = player_b_name
         # Variable to track if confirmation pop-up is open
         self.confirmation_active = False
         
@@ -300,7 +304,7 @@ class EnterConfirmation:
 
     def enter_results(self, event):
         """Handles the second Enter press (confirms the action)"""
-        display_stats()
+        display_stats(self.player_a_name, self.player_b_name)
         self.confirmation_active = False
         self.popup.destroy()
 
@@ -318,17 +322,21 @@ class TennisScoring:
         self.player_b_score = 0
         self.player_a_games = 0
         self.player_b_games = 0
-        self.server = "A"  # Player A starts serving
+        self.server = player_a_name  # Player A starts serving
         self.scoring_progression = [0, 15, 30, 40]  # Tennis scoring progression
 
         # Create the scoring section
         self.score_frame = tk.Frame(parent, bg="#ffffff")
         self.score_frame.grid(row=5, column=0, columnspan=8, pady=20)
+        self.toggle_server_button = tk.Button(self.parent, text="Toggle Server", command=self.toggle_server)
+        self.toggle_server_button.grid(row=2,column=5)
+        self.reset_score_btn = tk.Button(self.parent, text='Reset In-Game Score', command=self.reset_scores_and_display)
+        self.reset_score_btn.grid(row=2,column=6)
 
         # Player A Label
         self.player_a_label = tk.Label(
             self.score_frame,
-            text="Player A ●" if self.server == "A" else "Player A",
+            text=f"{self.player_a_name} ●" if self.server == self.player_a_name else f"{self.player_a_name}",
             font=("Helvetica", 14, "bold"),
             fg="black",
             bg="#ffffff"
@@ -348,7 +356,7 @@ class TennisScoring:
         # Player B Label
         self.player_b_label = tk.Label(
             self.score_frame,
-            text="Player B ●" if self.server == "B" else "Player B",
+            text=f"{self.player_b_name} ●" if self.server == self.player_b_name else f"{self.player_b_name}",
             font=("Helvetica", 14, "bold"),
             fg="black",
             bg="#ffffff"
@@ -387,14 +395,14 @@ class TennisScoring:
 
     def add_point(self, winner):
         """Add a point to the specified player and handle scoring logic."""
-        if winner == "A":
-            self.update_score("A")
-        elif winner == "B":
-            self.update_score("B")
+        if winner == self.player_a_name:
+            self.update_score(self.player_a_name)
+        elif winner == self.player_b_name:
+            self.update_score(self.player_b_name)
 
     def update_score(self, player):
         """Update the score for the specified player."""
-        if player == "A":
+        if player == self.player_a_name:
             if self.player_a_score == 40 and self.player_b_score == 40:
                 self.player_a_score = "Adv"
             elif self.player_a_score == "Adv" and self.player_b_score == 40:
@@ -408,7 +416,7 @@ class TennisScoring:
                 self.player_a_score = self.scoring_progression[
                     self.scoring_progression.index(self.player_a_score) + 1
                 ]
-        elif player == "B":
+        elif player == self.player_b_name:
             if self.player_b_score == 40 and self.player_a_score == 40:
                 self.player_b_score = "Adv"
             elif self.player_b_score == "Adv" and self.player_a_score == 40:
@@ -440,12 +448,42 @@ class TennisScoring:
         self.player_a_score = 0
         self.player_b_score = 0
 
+    def reset_scores_and_display(self):
+        """Reset the scores to 0 after a game is won."""
+        self.player_a_score = 0
+        self.player_b_score = 0
+        self.update_display()
+        listboxes_widgets = [
+            listbox_1st_direction, listbox_1st_result,
+            listbox_2nd_direction, listbox_2nd_result,
+            listbox_return_type, listbox_return_shot,
+            listbox_return_outcome, listbox_point_winner,
+            listbox_end_type, listbox_end_shot,
+            listbox_end_outcome, listbox_strategy_position,
+            listbox_strategy_play_style
+        ]
+        for lb in listboxes_widgets:
+            lb.selection_clear(0, tk.END)
+            lb.config(bg='white')
+            for i in range(lb.size()):
+                lb.itemconfig(i, bg="white")
+        listbox_1st_direction.focus_set()
+        focus_listbox(listbox_1st_direction) 
+
+
     def toggle_server(self):
         """Toggle the server and update the labels."""
-        if self.server == "A":
-            self.server = "B"
+        if self.server == self.player_a_name:
+            self.server = self.player_b_name
         else:
-            self.server = "A"
+            self.server = self.player_a_name
+        self.player_a_label.config(
+            text=f"{self.player_a_name} ●" if self.server == self.player_a_name else f"{self.player_a_name}"
+        )
+        self.player_b_label.config(
+            text=f"{self.player_b_name} ●" if self.server == self.player_b_name else f"{self.player_b_name}"
+        )
+
 
     def update_display(self):
         """Update the score and game labels."""
@@ -456,10 +494,10 @@ class TennisScoring:
 
         # Update the serving dot
         self.player_a_label.config(
-            text=f"{scoring_section.player_a_name} ●" if self.server == "A" else f"{scoring_section.player_a_name}"
+            text=f"{self.player_a_name} ●" if self.server == self.player_a_name else f"{self.player_a_name}"
         )
         self.player_b_label.config(
-            text=f"{scoring_section.player_b_name}●" if self.server == "B" else f"{scoring_section.player_b_name}"
+            text=f"{self.player_b_name} ●" if self.server == self.player_b_name else f"{self.player_b_name}"
         )
 
 # Main app window
@@ -474,8 +512,11 @@ top_frame.pack(side="top", fill="both", expand=True)
 bottom_frame = tk.Frame(app, height=500, bg="#ffffff", relief="ridge", bd=2)
 bottom_frame.pack(side="bottom", fill="both", expand=True)
 
-enter_confirmation = EnterConfirmation(app)
-scoring_section = TennisScoring(bottom_frame, 'A', "B")
+player_a_name = simpledialog.askstring("Player A", "Enter the name of Player A:")
+player_b_name = simpledialog.askstring("Player B", "Enter the name of Player B:")
+scoring_section = TennisScoring(bottom_frame, player_a_name, player_b_name)
+
+enter_confirmation = EnterConfirmation(app, player_a_name, player_b_name) # Needs to be after scoring_section obj
 
 # Add a Text widget to the top frame for displaying stats
 stats_display = tk.Text(top_frame, height=10, width=100, state="normal", bg="white", font=("Helvetica", 10))
@@ -539,7 +580,7 @@ listbox_return_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
 
 # listbox point winner
 
-point_winners = ["A", "B"]
+point_winners = [player_a_name, player_b_name]
 
 # --- Point Winner ---
 listbox_point_winner = CustomListbox(bottom_frame, point_winners, 10, 1, 7)
@@ -581,7 +622,7 @@ listbox_end_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
 tk.Label(bottom_frame, text="Strategy", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=2, column=3, padx=10, pady=15, sticky="nw")
 
 # List items for Strategy
-strategy_position_items = ["Baseline", "A at net", "B at net", "Both at net"]
+strategy_position_items = ["Baseline", f"{player_a_name} at net", f"{player_b_name} at net", "Both at net"]
 strategy_play_style_items = ["", "Serve and Volley"]
 
 # --- Strategy - Position ---
@@ -597,8 +638,6 @@ listbox_strategy_play_style.bind("<Right>", move_focus_right)  # Bind Right arro
 # -------------------------
 # 🚀 Submit button
 # -------------------------
-submit_btn = tk.Button(bottom_frame, text="Submit", command=display_stats, bg="#4CAF50", fg="white", font=("Helvetica", 12, "bold"))
-submit_btn.grid(row=4, column=0, columnspan=8, pady=15)
 
 listbox_1st_direction.focus_set()
 

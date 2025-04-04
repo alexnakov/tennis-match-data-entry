@@ -537,20 +537,20 @@ serve_direction_items = ["Wide", "Body", "Center", "In Net"]
 serve_result_items = ["In", "Winner", "Ace", "Fault"]
 
 
-listbox_1st_direction = CustomListbox(bottom_frame, serve_direction_items, 10, 1, 0)
+listbox_1st_direction = CustomListbox(bottom_frame, serve_direction_items, 8, 1, 0)
 listbox_1st_direction.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_1st_direction.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-listbox_1st_result = CustomListbox(bottom_frame, serve_result_items, 10, 1, 1)
+listbox_1st_result = CustomListbox(bottom_frame, serve_result_items, 8, 1, 1)
 listbox_1st_result.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_1st_result.bind("<Right>", move_focus_right)  # Bind Right arrow
 
 # --- 2nd Serve ---
-listbox_2nd_direction = CustomListbox(bottom_frame, serve_direction_items, 10, 1, 2)
+listbox_2nd_direction = CustomListbox(bottom_frame, serve_direction_items, 8, 1, 2)
 listbox_2nd_direction.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_2nd_direction.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-listbox_2nd_result = CustomListbox(bottom_frame, serve_result_items, 10, 1, 3)
+listbox_2nd_result = CustomListbox(bottom_frame, serve_result_items, 8, 1, 3)
 listbox_2nd_result.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_2nd_result.bind("<Right>", move_focus_right)  # Bind Right arrow
 
@@ -564,17 +564,17 @@ return_shot_items = ["Return", "Pass", "Approach", "Drop", "Lob"]
 return_outcome_items = ["In", "Winner", "Unforced", "Forced"]
 
 # --- Return - Type ---
-listbox_return_type = CustomListbox(bottom_frame, return_type_items, 10, 1, 4)
+listbox_return_type = CustomListbox(bottom_frame, return_type_items, 8, 1, 4)
 listbox_return_type.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_return_type.bind("<Right>", move_focus_right)  # Bind Right arrow
 
 # --- Return - Shot ---
-listbox_return_shot = CustomListbox(bottom_frame, return_shot_items, 10, 1, 5)
+listbox_return_shot = CustomListbox(bottom_frame, return_shot_items, 8, 1, 5)
 listbox_return_shot.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_return_shot.bind("<Right>", move_focus_right)  # Bind Right arrow
 
 # --- Return - Outcome ---
-listbox_return_outcome = CustomListbox(bottom_frame, return_outcome_items, 10, 1, 6)
+listbox_return_outcome = CustomListbox(bottom_frame, return_outcome_items, 8, 1, 6)
 listbox_return_outcome.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_return_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
 
@@ -583,7 +583,7 @@ listbox_return_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
 point_winners = [player_a_name, player_b_name]
 
 # --- Point Winner ---
-listbox_point_winner = CustomListbox(bottom_frame, point_winners, 10, 1, 7)
+listbox_point_winner = CustomListbox(bottom_frame, point_winners, 8, 1, 7)
 listbox_point_winner.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_point_winner.bind("<Right>", move_focus_right)  # Bind Right arrow
 
@@ -600,17 +600,17 @@ end_shot_items = ["Drive", "Volley", "Smash", "Pass", "Approach", "Lob", "Drop"]
 end_outcome_items = ["Winner", "Forced", "Unforced"]
 
 # --- End - Type ---
-listbox_end_type = CustomListbox(bottom_frame, end_type_items, 10, 3, 0)
+listbox_end_type = CustomListbox(bottom_frame, end_type_items, 8, 3, 0)
 listbox_end_type.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_end_type.bind("<Right>", move_focus_right)  # Bind Right arrow
 
 # --- End - Shot ---
-listbox_end_shot = CustomListbox(bottom_frame, end_shot_items, 12, 3, 1)
+listbox_end_shot = CustomListbox(bottom_frame, end_shot_items, 8, 3, 1)
 listbox_end_shot.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_end_shot.bind("<Right>", move_focus_right)  # Bind Right arrow
 
 # --- End - Outcome ---
-listbox_end_outcome = CustomListbox(bottom_frame, end_outcome_items, 10, 3, 2)
+listbox_end_outcome = CustomListbox(bottom_frame, end_outcome_items, 8, 3, 2)
 listbox_end_outcome.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_end_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
 
@@ -623,15 +623,15 @@ tk.Label(bottom_frame, text="Strategy", font=("Helvetica", 12, "bold"), bg="#fff
 
 # List items for Strategy
 strategy_position_items = ["Baseline", f"{player_a_name} at net", f"{player_b_name} at net", "Both at net"]
-strategy_play_style_items = ["", "Serve and Volley"]
+strategy_play_style_items = ["", "Serve & Volley"]
 
 # --- Strategy - Position ---
-listbox_strategy_position = CustomListbox(bottom_frame, strategy_position_items, 11, 3, 3)
+listbox_strategy_position = CustomListbox(bottom_frame, strategy_position_items, 9, 3, 3)
 listbox_strategy_position.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_strategy_position.bind("<Right>", move_focus_right)  # Bind Right arrow
 
 # --- Strategy - Play Style ---
-listbox_strategy_play_style = CustomListbox(bottom_frame, strategy_play_style_items, 12, 3, 4)
+listbox_strategy_play_style = CustomListbox(bottom_frame, strategy_play_style_items, 11, 3, 4)
 listbox_strategy_play_style.bind("<Left>", move_focus_left)  # Bind Left arrow
 listbox_strategy_play_style.bind("<Right>", move_focus_right)  # Bind Right arrow
 

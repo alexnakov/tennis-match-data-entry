@@ -13,7 +13,7 @@ def get_current_data():
         "Return": (listbox_return_type.get(tk.ACTIVE) if listbox_return_type.curselection() else "") + ' ' + (listbox_return_shot.get(tk.ACTIVE) if listbox_return_shot.curselection() else "") + ' ' + (listbox_return_outcome.get(tk.ACTIVE) if listbox_return_outcome.curselection() else ""),
         "Winner": listbox_point_winner.get(tk.ACTIVE) if listbox_point_winner.curselection() else "",
         "End": (listbox_end_type.get(tk.ACTIVE) if listbox_end_type.curselection() else "") + ' ' + (listbox_end_shot.get(tk.ACTIVE) if listbox_end_shot.curselection() else "") + ' ' + (listbox_end_outcome.get(tk.ACTIVE) if listbox_end_outcome.curselection() else ""),
-        "Strategy": (listbox_strategy_position.get(tk.ACTIVE) if listbox_strategy_position.curselection() else "") + (listbox_strategy_play_style.get(tk.ACTIVE) if listbox_strategy_play_style.curselection() else ""),
+        "Strategy": (listbox_strategy_position.get(tk.ACTIVE) if listbox_strategy_position.curselection() else "") +  '+' +(listbox_strategy_play_style.get(tk.ACTIVE) if listbox_strategy_play_style.curselection() else ""),
     }
     
     return data
@@ -519,7 +519,7 @@ scoring_section = TennisScoring(bottom_frame, player_a_name, player_b_name)
 enter_confirmation = EnterConfirmation(app, player_a_name, player_b_name) # Needs to be after scoring_section obj
 
 # Add a Text widget to the top frame for displaying stats
-stats_display = tk.Text(top_frame, height=10, width=100, state="normal", bg="white", font=("Helvetica", 10))
+stats_display = tk.Text(top_frame, height=10, width=140, state="normal", bg="white", font=("Helvetica", 10))
 stats_display.pack(padx=10, pady=10)
 
 # -------------------------

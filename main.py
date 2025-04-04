@@ -329,9 +329,9 @@ class TennisScoring:
         self.score_frame = tk.Frame(parent, bg="#ffffff")
         self.score_frame.grid(row=5, column=0, columnspan=8, pady=20)
         self.toggle_server_button = tk.Button(self.parent, text="Toggle Server", command=self.toggle_server)
-        self.toggle_server_button.grid(row=2,column=5)
+        self.toggle_server_button.grid(row=3,column=7)
         self.reset_score_btn = tk.Button(self.parent, text='Reset In-Game Score', command=self.reset_scores_and_display)
-        self.reset_score_btn.grid(row=2,column=6)
+        self.reset_score_btn.grid(row=3,column=8)
 
         # Player A Label
         self.player_a_label = tk.Label(

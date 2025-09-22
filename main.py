@@ -2,18 +2,21 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import simpledialog
 
+# About to make changes to APP
 
 my_lightblue = '#b2d6fe'
 
 def get_current_data():
     """Retrieves the currently selected data from all listboxes."""
+
+    
     data = {
         "1st": (listbox_1st_direction.get(tk.ACTIVE) if listbox_1st_direction.curselection() else "Wide") + ' ' + (listbox_1st_result.get(tk.ACTIVE) if listbox_1st_result.curselection() else ""),
         "2nd": (listbox_2nd_direction.get(tk.ACTIVE) if listbox_2nd_direction.curselection() else "") + ' ' + (listbox_2nd_result.get(tk.ACTIVE) if listbox_2nd_result.curselection() else ""), 
         "Return": (listbox_return_type.get(tk.ACTIVE) if listbox_return_type.curselection() else "") + ' ' + (listbox_return_shot.get(tk.ACTIVE) if listbox_return_shot.curselection() else "") + ' ' + (listbox_return_outcome.get(tk.ACTIVE) if listbox_return_outcome.curselection() else ""),
         "Winner": listbox_point_winner.get(tk.ACTIVE) if listbox_point_winner.curselection() else "",
         "End": (listbox_end_type.get(tk.ACTIVE) if listbox_end_type.curselection() else "") + ' ' + (listbox_end_shot.get(tk.ACTIVE) if listbox_end_shot.curselection() else "") + ' ' + (listbox_end_outcome.get(tk.ACTIVE) if listbox_end_outcome.curselection() else ""),
-        "Strategy": (listbox_strategy_position.get(tk.ACTIVE) if listbox_strategy_position.curselection() else "") +  '+' +(listbox_strategy_play_style.get(tk.ACTIVE) if listbox_strategy_play_style.curselection() else ""),
+        "Strategy": (listbox_strategy_position.get(tk.ACTIVE) if listbox_strategy_position.curselection() else "") +  ' + ' + (listbox_strategy_play_style.get(tk.ACTIVE) if listbox_strategy_play_style.curselection() else ""),
     }
     
     return data
@@ -500,152 +503,153 @@ class TennisScoring:
             text=f"{self.player_b_name} ●" if self.server == self.player_b_name else f"{self.player_b_name}"
         )
 
-# Main app window
-app = tk.Tk()
-app.title("Tennis Data Entry App")
-app.geometry("1200x700")
-app.configure(bg="#f0f0f0")
+if __name__ == "__main__":
+    # Main app window
+    app = tk.Tk()
+    app.title("Tennis Data Entry App")
+    app.geometry("1200x700")
+    app.configure(bg="#f0f0f0")
 
-top_frame = tk.Frame(app, height=200, bg=my_lightblue)
-top_frame.pack(side="top", fill="both", expand=True)
+    top_frame = tk.Frame(app, height=200, bg=my_lightblue)
+    top_frame.pack(side="top", fill="both", expand=True)
 
-bottom_frame = tk.Frame(app, height=500, bg="#ffffff", relief="ridge", bd=2)
-bottom_frame.pack(side="bottom", fill="both", expand=True)
+    bottom_frame = tk.Frame(app, height=500, bg="#ffffff", relief="ridge", bd=2)
+    bottom_frame.pack(side="bottom", fill="both", expand=True)
 
-player_a_name = simpledialog.askstring("Player A", "Enter the name of Player A:")
-player_b_name = simpledialog.askstring("Player B", "Enter the name of Player B:")
-scoring_section = TennisScoring(bottom_frame, player_a_name, player_b_name)
+    player_a_name = simpledialog.askstring("Player A", "Enter the name of Player A:")
+    player_b_name = simpledialog.askstring("Player B", "Enter the name of Player B:")
+    scoring_section = TennisScoring(bottom_frame, player_a_name, player_b_name)
 
-enter_confirmation = EnterConfirmation(app, player_a_name, player_b_name) # Needs to be after scoring_section obj
+    enter_confirmation = EnterConfirmation(app, player_a_name, player_b_name) # Needs to be after scoring_section obj
 
-# Add a Text widget to the top frame for displaying stats
-stats_display = tk.Text(top_frame, height=10, width=140, state="normal", bg="white", font=("Helvetica", 10))
-stats_display.pack(padx=10, pady=10)
+    # Add a Text widget to the top frame for displaying stats
+    stats_display = tk.Text(top_frame, height=10, width=140, state="normal", bg="white", font=("Helvetica", 10))
+    stats_display.pack(padx=10, pady=10)
 
-# -------------------------
-# 🎯 Labels in One Row (Serve, Return, Point Winner)
-# -------------------------
-# Labels (single row)
-tk.Label(bottom_frame, text="1st Serve", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=0, padx=10, pady=5, sticky="nw")
-tk.Label(bottom_frame, text="2nd Serve", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=2, padx=10, pady=5, sticky="nw")
-tk.Label(bottom_frame, text="Return", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=4, padx=10, pady=5, sticky="nw")
-tk.Label(bottom_frame, text="Point Winner", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=7, padx=10, pady=5, sticky="nw")
-
-
-# List items
-serve_direction_items = ["Wide", "Body", "Center", "In Net"]
-serve_result_items = ["In", "Winner", "Ace", "Fault"]
+    # -------------------------
+    # 🎯 Labels in One Row (Serve, Return, Point Winner)
+    # -------------------------
+    # Labels (single row)
+    tk.Label(bottom_frame, text="1st Serve", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=0, padx=10, pady=5, sticky="nw")
+    tk.Label(bottom_frame, text="2nd Serve", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=2, padx=10, pady=5, sticky="nw")
+    tk.Label(bottom_frame, text="Return", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=4, padx=10, pady=5, sticky="nw")
+    tk.Label(bottom_frame, text="Point Winner", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=0, column=7, padx=10, pady=5, sticky="nw")
 
 
-listbox_1st_direction = CustomListbox(bottom_frame, serve_direction_items, 8, 1, 0)
-listbox_1st_direction.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_1st_direction.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # List items
+    serve_direction_items = ["Wide", "Body", "Center", "In Net"]
+    serve_result_items = ["In", "Winner", "Ace", "Fault"]
 
-listbox_1st_result = CustomListbox(bottom_frame, serve_result_items, 8, 1, 1)
-listbox_1st_result.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_1st_result.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# --- 2nd Serve ---
-listbox_2nd_direction = CustomListbox(bottom_frame, serve_direction_items, 8, 1, 2)
-listbox_2nd_direction.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_2nd_direction.bind("<Right>", move_focus_right)  # Bind Right arrow
+    listbox_1st_direction = CustomListbox(bottom_frame, serve_direction_items, 8, 1, 0)
+    listbox_1st_direction.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_1st_direction.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-listbox_2nd_result = CustomListbox(bottom_frame, serve_result_items, 8, 1, 3)
-listbox_2nd_result.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_2nd_result.bind("<Right>", move_focus_right)  # Bind Right arrow
+    listbox_1st_result = CustomListbox(bottom_frame, serve_result_items, 8, 1, 1)
+    listbox_1st_result.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_1st_result.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# -------------------------
-# 🎾 Vertical Lists for Return
-# -------------------------
+    # --- 2nd Serve ---
+    listbox_2nd_direction = CustomListbox(bottom_frame, serve_direction_items, 8, 1, 2)
+    listbox_2nd_direction.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_2nd_direction.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# List items for Return
-return_type_items = ["Forehand", "Backhand"]
-return_shot_items = ["Return", "Pass", "Approach", "Drop", "Lob"]
-return_outcome_items = ["In", "Winner", "Unforced", "Forced"]
+    listbox_2nd_result = CustomListbox(bottom_frame, serve_result_items, 8, 1, 3)
+    listbox_2nd_result.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_2nd_result.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# --- Return - Type ---
-listbox_return_type = CustomListbox(bottom_frame, return_type_items, 8, 1, 4)
-listbox_return_type.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_return_type.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # -------------------------
+    # 🎾 Vertical Lists for Return
+    # -------------------------
 
-# --- Return - Shot ---
-listbox_return_shot = CustomListbox(bottom_frame, return_shot_items, 8, 1, 5)
-listbox_return_shot.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_return_shot.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # List items for Return
+    return_type_items = ["Forehand", "Backhand"]
+    return_shot_items = ["Return", "Pass", "Approach", "Drop", "Lob"]
+    return_outcome_items = ["In", "Winner", "Unforced", "Forced"]
 
-# --- Return - Outcome ---
-listbox_return_outcome = CustomListbox(bottom_frame, return_outcome_items, 8, 1, 6)
-listbox_return_outcome.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_return_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # --- Return - Type ---
+    listbox_return_type = CustomListbox(bottom_frame, return_type_items, 8, 1, 4)
+    listbox_return_type.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_return_type.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# listbox point winner
+    # --- Return - Shot ---
+    listbox_return_shot = CustomListbox(bottom_frame, return_shot_items, 8, 1, 5)
+    listbox_return_shot.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_return_shot.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-point_winners = [player_a_name, player_b_name]
+    # --- Return - Outcome ---
+    listbox_return_outcome = CustomListbox(bottom_frame, return_outcome_items, 8, 1, 6)
+    listbox_return_outcome.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_return_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# --- Point Winner ---
-listbox_point_winner = CustomListbox(bottom_frame, point_winners, 8, 1, 7)
-listbox_point_winner.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_point_winner.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # listbox point winner
 
-# -------------------------
-# 🎯 New Row - End Section
-# -------------------------
+    point_winners = [player_a_name, player_b_name]
 
-# Label
-tk.Label(bottom_frame, text="End", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=2, column=0, padx=10, pady=15, sticky="nw")
+    # --- Point Winner ---
+    listbox_point_winner = CustomListbox(bottom_frame, point_winners, 8, 1, 7)
+    listbox_point_winner.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_point_winner.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# List items for End
-end_type_items = ["Forehand", "Backhand"]
-end_shot_items = ["Drive", "Volley", "Smash", "Pass", "Approach", "Lob", "Drop"]
-end_outcome_items = ["Winner", "Forced", "Unforced"]
+    # -------------------------
+    # 🎯 New Row - End Section
+    # -------------------------
 
-# --- End - Type ---
-listbox_end_type = CustomListbox(bottom_frame, end_type_items, 8, 3, 0)
-listbox_end_type.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_end_type.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # Label
+    tk.Label(bottom_frame, text="End", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=2, column=0, padx=10, pady=15, sticky="nw")
 
-# --- End - Shot ---
-listbox_end_shot = CustomListbox(bottom_frame, end_shot_items, 8, 3, 1)
-listbox_end_shot.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_end_shot.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # List items for End
+    end_type_items = ["Forehand", "Backhand"]
+    end_shot_items = ["Drive", "Volley", "Smash", "Pass", "Approach", "Lob", "Drop"]
+    end_outcome_items = ["Winner", "Forced", "Unforced"]
 
-# --- End - Outcome ---
-listbox_end_outcome = CustomListbox(bottom_frame, end_outcome_items, 8, 3, 2)
-listbox_end_outcome.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_end_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # --- End - Type ---
+    listbox_end_type = CustomListbox(bottom_frame, end_type_items, 8, 3, 0)
+    listbox_end_type.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_end_type.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# -------------------------
-# 🎯 New Row - Strategy Section (same row as End)
-# -------------------------
+    # --- End - Shot ---
+    listbox_end_shot = CustomListbox(bottom_frame, end_shot_items, 8, 3, 1)
+    listbox_end_shot.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_end_shot.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# Label
-tk.Label(bottom_frame, text="Strategy", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=2, column=3, padx=10, pady=15, sticky="nw")
+    # --- End - Outcome ---
+    listbox_end_outcome = CustomListbox(bottom_frame, end_outcome_items, 8, 3, 2)
+    listbox_end_outcome.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_end_outcome.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# List items for Strategy
-strategy_position_items = ["Baseline", f"{player_a_name} at net", f"{player_b_name} at net", "Both at net"]
-strategy_play_style_items = ["", "Serve & Volley"]
+    # -------------------------
+    # 🎯 New Row - Strategy Section (same row as End)
+    # -------------------------
 
-# --- Strategy - Position ---
-listbox_strategy_position = CustomListbox(bottom_frame, strategy_position_items, 9, 3, 3)
-listbox_strategy_position.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_strategy_position.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # Label
+    tk.Label(bottom_frame, text="Strategy", font=("Helvetica", 12, "bold"), bg="#ffffff").grid(row=2, column=3, padx=10, pady=15, sticky="nw")
 
-# --- Strategy - Play Style ---
-listbox_strategy_play_style = CustomListbox(bottom_frame, strategy_play_style_items, 11, 3, 4)
-listbox_strategy_play_style.bind("<Left>", move_focus_left)  # Bind Left arrow
-listbox_strategy_play_style.bind("<Right>", move_focus_right)  # Bind Right arrow
+    # List items for Strategy
+    strategy_position_items = ["Baseline", f"{player_a_name} at net", f"{player_b_name} at net", "Both at net"]
+    strategy_play_style_items = ["", "Serve & Volley"]
 
-# -------------------------
-# 🚀 Submit button
-# -------------------------
+    # --- Strategy - Position ---
+    listbox_strategy_position = CustomListbox(bottom_frame, strategy_position_items, 12, 3, 3)
+    listbox_strategy_position.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_strategy_position.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-listbox_1st_direction.focus_set()
+    # --- Strategy - Play Style ---
+    listbox_strategy_play_style = CustomListbox(bottom_frame, strategy_play_style_items, 11, 3, 4)
+    listbox_strategy_play_style.bind("<Left>", move_focus_left)  # Bind Left arrow
+    listbox_strategy_play_style.bind("<Right>", move_focus_right)  # Bind Right arrow
 
-# Create a simple object with a 'widget' attribute
-class FakeEvent:
-    def __init__(self, widget):
-        self.widget = widget
+    # -------------------------
+    # 🚀 Submit button
+    # -------------------------
 
-on_focus_in(FakeEvent(widget=listbox_1st_direction))
+    listbox_1st_direction.focus_set()
 
-app.mainloop()
+    # Create a simple object with a 'widget' attribute
+    class FakeEvent:
+        def __init__(self, widget):
+            self.widget = widget
+
+    on_focus_in(FakeEvent(widget=listbox_1st_direction))
+
+    app.mainloop()

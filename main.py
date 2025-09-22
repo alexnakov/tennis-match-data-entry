@@ -504,6 +504,7 @@ class TennisScoring:
         )
 
 if __name__ == "__main__":
+
     # Main app window
     app = tk.Tk()
     app.title("Tennis Data Entry App")

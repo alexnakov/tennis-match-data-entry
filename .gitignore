@@ -4,3 +4,4 @@ build
 main.spec
 setup.py
 __pycache__/
+tests/__pycache__
